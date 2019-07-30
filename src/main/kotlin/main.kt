@@ -12,16 +12,13 @@ private fun getZeroOrOne() = (0..1).random()
 //    }
 //}
 
-fun main(args: Array<String>) {
-//    (0 .. 100).forEach {
-//        println(getZeroOrOne())
-//    }
-//    (0 .. 10).forEach {
-//        println(getDigit(it))
-//    }
-    println(
-        getRandomNumber(1000)
-    )
+fun main() {
+    val maxNumber = 2048
+    (0 ..  999999999999999).forEach { _ ->
+        val randomValue = getRandomNumber(maxNumber)
+        println("randomValue: $randomValue")
+        if (randomValue > maxNumber - 1) throw Exception("randomValue: $randomValue")
+    }
 }
 /*
 실행: get_random(5)
@@ -31,28 +28,25 @@ fun main(args: Array<String>) {
 결과: 0 or 1 or 2
  */
 fun getRandomNumber(maxNumber: Int): Int {
-    if (maxNumber < 0) throw Exception("maxNumber must be positive: $maxNumber")
-    if (maxNumber == 0) return 0
+    if (maxNumber < 1) throw Exception("maxNumber must be bigger than 0 : $maxNumber")
+    if (maxNumber == 1) return 0
 
     var rest = maxNumber
-    var randomValue = getZeroOrOne()
-    var count = 1
-    while (rest > 1) {
+    var accRandomValue = getZeroOrOne()
+    var timesValue = 1
+
+    while (true) {
         rest /= 2
-        randomValue += (getTwoPower(count) * getZeroOrOne())
-        count ++
+        timesValue *= 2
+        val nextRandomValue = timesValue * getZeroOrOne()
+        if (rest > 1) {
+            accRandomValue += nextRandomValue
+        } else {
+            if (maxNumber > accRandomValue + nextRandomValue) accRandomValue += nextRandomValue
+            break
+        }
     }
-    println("randomValue: $randomValue")
-    return randomValue
-}
-
-fun getTwoPower(x: Int): Int {
-    var result = 1
-    for (x in 1 .. x) {
-         result *= 2
-    }
-
-    return result
+    return accRandomValue
 }
 
 fun getRandomNumber2(maxNumber: Int) {
