@@ -4,22 +4,25 @@ import kotlinx.coroutines.runBlocking
 
 fun main() {
     runBlocking {
+        val runCount = 10000
         val maxNumber = 5
-        val resultMap = MutableList(maxNumber) { 0 }
-        println("before resultMap: $resultMap")
+        val resultList = MutableList(maxNumber) { 0 }
+        println("before resultMap: $resultList")
         val async = async {
-            repeat(100000) {
+            repeat(runCount) {
                 launch {
                     val randomValue = getRandomNumber2(maxNumber)
-                    println("[$it]randomValue: $randomValue")
-                    resultMap[randomValue]++
+//                    println("[$it]randomValue: $randomValue")
+                    resultList[randomValue]++
                     if (randomValue > maxNumber - 1) throw Exception("randomValue: $randomValue")
                 }
             }
         }
 
         async.await()
-        println("after resultMap: $resultMap")
+        println("after resultList: ${resultList.map {
+            it.toFloat() / runCount
+        }}")
     }
 }
 
