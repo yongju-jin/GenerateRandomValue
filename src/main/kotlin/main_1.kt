@@ -20,6 +20,10 @@ fun main() {
             }
         }
         async.await()
+        //여러 coroutine에서 한 개의 자원(resultList)에 접근하지만 값이 정상적으로 나옴. 왜?? 우연??
+        println("execute run count: ${resultList.fold(0) { acc, next ->
+            acc + next
+        }}")
         println("after resultList: ${resultList.map { it.toFloat() / runCount }}")
     }
 }
