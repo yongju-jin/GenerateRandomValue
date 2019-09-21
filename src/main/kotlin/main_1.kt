@@ -1,9 +1,24 @@
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+
 fun main() {
-    val maxNumber = 2048
-    (0 ..  999999999999999).forEach { _ ->
-        val randomValue = getRandomNumber(maxNumber)
-        println("randomValue: $randomValue")
-        if (randomValue > maxNumber - 1) throw Exception("randomValue: $randomValue")
+    runBlocking {
+        val maxNumber = 5
+        val resultList = MutableList(maxNumber) { 0 }
+        println("before resultList: $resultList")
+        val async = async {
+            repeat(10000) {
+                launch {
+                    val randomValue = getRandomNumber(maxNumber)
+//                    println("randomValue: $randomValue")
+                    resultList[randomValue]++
+                    if (randomValue > maxNumber - 1) throw Exception("randomValue: $randomValue")
+                }
+            }
+        }
+        async.await()
+        println("after resultList: $resultList")
     }
 }
 
@@ -18,9 +33,9 @@ fun getRandomNumber(maxNumber: Int): Int {
     if (maxNumber < 1) throw Exception("maxNumber must be bigger than 0 : $maxNumber")
     if (maxNumber == 1) return 0
 
-    var rest = maxNumber
-    var accRandomValue = getZeroOrOne()
-    var timesValue = 1
+    var rest = maxNumber // 나머지 값
+    var accRandomValue = getZeroOrOne() // 랜덤 값
+    var timesValue = 1 // 곱하기를 위한 값
 
     while (true) {
         rest /= 2

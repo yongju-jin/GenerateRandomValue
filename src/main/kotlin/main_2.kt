@@ -1,11 +1,25 @@
-import kotlin.math.pow
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 fun main() {
-    val maxNumber = 2048
-    (0 ..  999999999999999).forEach { _ ->
-        val randomValue = getRandomNumber2(maxNumber)
-        println("randomValue: $randomValue")
-        if (randomValue > maxNumber - 1) throw Exception("randomValue: $randomValue")
+    runBlocking {
+        val maxNumber = 5
+        val resultMap = MutableList(maxNumber) { 0 }
+        println("before resultMap: $resultMap")
+        val async = async {
+            repeat(100000) {
+                launch {
+                    val randomValue = getRandomNumber2(maxNumber)
+                    println("[$it]randomValue: $randomValue")
+                    resultMap[randomValue]++
+                    if (randomValue > maxNumber - 1) throw Exception("randomValue: $randomValue")
+                }
+            }
+        }
+
+        async.await()
+        println("after resultMap: $resultMap")
     }
 }
 
@@ -19,6 +33,7 @@ fun getRandomNumber2(maxNumber: Int): Int {
     } else randomValue
 }
 
+// 2진수 자릿수 구하기
 tailrec fun getBinaryDigits(number: Int, acc: Int = 0): Int {
     if (number < 1) throw Exception("number must be bigger than 0: $number")
 
@@ -30,7 +45,7 @@ tailrec fun getBinaryDigits(number: Int, acc: Int = 0): Int {
 
 fun getRandomBinaryList(digitCount: Int): List<Int> {
     if (digitCount < 0) throw Exception("digitCount must be bigger than -1: $digitCount")
-    if (digitCount == 0) emptyList<Int>()
+    if (digitCount == 0) return emptyList()
 
     val retList = mutableListOf<Int>()
     for (i in 0 until digitCount) {
@@ -47,7 +62,7 @@ fun getBinaryListToDecimal(binaryList: List<Int>): Int {
     return if (binaryList.isEmpty()) 0
     else {
         var acc = 0
-        for (i in 0 until binaryList.size) {
+        for (i in binaryList.indices) {
             val value = binaryList[i]
             if (value > 1)throw Exception("binaryList could not contain numbers bigger than 1: $value")
             acc += powOfTwo(i) * value
