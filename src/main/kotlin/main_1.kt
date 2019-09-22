@@ -12,7 +12,7 @@ fun main() {
         val async = async {
             repeat(runCount) {
                 launch {
-                    val randomValue = getRandomNumber(maxNumber)
+                    val randomValue = getRandomNumberByResetInvalidNumber(maxNumber)
 //                    println("randomValue: $randomValue")
                     resultList[randomValue]++
                     if (randomValue > maxNumber - 1) throw Exception("randomValue: $randomValue")
@@ -35,6 +35,36 @@ fun main() {
 실행: get_random(3)
 결과: 0 or 1 or 2
  */
+fun getRandomNumberByResetInvalidNumber(maxNumber: Int): Int {
+    if (maxNumber < 1) throw Exception("maxNumber must be bigger than 0 : $maxNumber")
+    if (maxNumber == 1) return 0
+
+    var rest = maxNumber // 나머지 값
+    var accRandomValue = getZeroOrOne() // 랜덤 값
+    var timesValue = 1 // 곱하기를 위한 값
+
+    while (true) {
+        rest /= 2
+        timesValue *= 2
+        val nextRandomValue = timesValue * getZeroOrOne()
+
+        if (rest > 1) {
+            accRandomValue += nextRandomValue
+        } else {
+            if (maxNumber > accRandomValue + nextRandomValue) {
+                accRandomValue += nextRandomValue
+                break
+            } else {
+                rest = maxNumber
+                accRandomValue = getZeroOrOne()
+                timesValue = 1
+            }
+        }
+    }
+
+    return accRandomValue
+}
+
 fun getRandomNumber(maxNumber: Int): Int {
     if (maxNumber < 1) throw Exception("maxNumber must be bigger than 0 : $maxNumber")
     if (maxNumber == 1) return 0
@@ -47,6 +77,7 @@ fun getRandomNumber(maxNumber: Int): Int {
         rest /= 2
         timesValue *= 2
         val nextRandomValue = timesValue * getZeroOrOne()
+
         if (rest > 1) {
             accRandomValue += nextRandomValue
         } else {
@@ -54,6 +85,6 @@ fun getRandomNumber(maxNumber: Int): Int {
             break
         }
     }
+
     return accRandomValue
 }
-

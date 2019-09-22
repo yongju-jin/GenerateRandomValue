@@ -11,8 +11,8 @@ fun main() {
         val async = async {
             repeat(runCount) {
                 launch {
-                    val randomValue = getRandomNumber2(maxNumber)
-//                    println("[$it]randomValue: $randomValue")
+                    val randomValue = getRandomNumber2ByResetInvalidNumber(maxNumber)
+//                    println("[$it] randomValue: $randomValue")
                     resultList[randomValue]++
                     if (randomValue > maxNumber - 1) throw Exception("randomValue: $randomValue")
                 }
@@ -33,11 +33,23 @@ fun main() {
 fun getRandomNumber2(maxNumber: Int): Int {
     val digitCount = getBinaryDigits(maxNumber)
     val randomBinaryList = getRandomBinaryList(digitCount)
-
     val randomValue = getBinaryListToDecimal(randomBinaryList)
+
     return if (randomValue >= maxNumber) {
         randomValue - powOfTwo(randomBinaryList.size - 1)
     } else randomValue
+}
+
+fun getRandomNumber2ByResetInvalidNumber(maxNumber: Int): Int {
+    while(true) {
+        val randomValue = getBinaryListToDecimal(
+            getRandomBinaryList(
+                getBinaryDigits(maxNumber)
+            )
+        )
+
+        if (randomValue < maxNumber) return randomValue
+    }
 }
 
 // 2진수 자릿수 구하기
@@ -71,7 +83,7 @@ fun getBinaryListToDecimal(binaryList: List<Int>): Int {
         var acc = 0
         for (i in binaryList.indices) {
             val value = binaryList[i]
-            if (value > 1)throw Exception("binaryList could not contain numbers bigger than 1: $value")
+            if (value > 1) throw Exception("binaryList could not contain numbers bigger than 1: $value")
             acc += powOfTwo(i) * value
         }
         acc
